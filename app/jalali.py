@@ -9,12 +9,11 @@ HTTP. The calendar displays all 12 months of the current Jalali year in a respon
 layout with modern styling, highlighting today's date prominently. The Jalali calendar is the
 official calendar system used in Iran and Afghanistan.
 """
-import jdatetime
 import http.server
 import socketserver
 import time
 from multiprocessing import Process
-
+import jdatetime
 
 def jalali():
     """
@@ -88,7 +87,7 @@ def generate_jalali_html_calendar() -> str:
         "Mehr", "Aban", "Azar",
         "Dey", "Bahman", "Esfand"
     ]
-    
+
     # Traditional calendar headers (jdatetime index: Sat=0, Sun=1, ..., Fr=6)
     week_headers = ["Sa", "Su", "Mo", "Tu", "We", "Th", "Fr"]
 
@@ -192,10 +191,10 @@ def generate_jalali_html_calendar() -> str:
     for m_idx in range(1, 13):
         html.append("        <table class='month-table'>")
         html.append(f"            <tr><th colspan='7' class='month-title'>{months_names[m_idx-1]} ({m_idx})</th></tr>")
-        
+
         # Add weekday row headers
         html.append("            <tr>" + "".join(f"<th>{day}</th>" for day in week_headers) + "</tr>")
-        
+
         # Calculate days in the month
         if m_idx <= 6:
             days_in_month = 31
@@ -203,46 +202,46 @@ def generate_jalali_html_calendar() -> str:
             days_in_month = 30
         else:
             days_in_month = 30 if jdatetime.date(current_year, 1, 1).isleap() else 29
-            
+
         # Get the first day of the month
         first_day_date = jdatetime.date(current_year, m_idx, 1)
         start_padding = first_day_date.weekday()
-        
+
         html.append("            <tr>")
-        
+
         # Insert initial empty cells for padding
         for _ in range(start_padding):
             html.append("                <td class='empty-cell'></td>")
-            
+
         current_column = start_padding
-        
+
         # Populate days
         for day in range(1, days_in_month + 1):
             if current_year == today.year and m_idx == current_month and day == current_day:
                 cell_class = " class='today'"
             else:
                 cell_class = ""
-                
+
             html.append(f"                <td{cell_class}>{day}</td>")
             current_column += 1
-            
+
             # Break row table if it hits the end of the week (Friday / 7th column)
             if current_column == 7:
                 if day < days_in_month:
                     html.append("            </tr>\n            <tr>")
                 current_column = 0
-                
+
         # Pad trailing empty cells at the end of the month block
         if current_column < 7 and current_column > 0:
             for _ in range(7 - current_column):
                 html.append("                <td class='empty-cell'></td>")
-                
+
         html.append("            </tr>")
         html.append("        </table>")
 
     # Close structure
     html.extend(["    </div>", "</body>", "</html>"])
-    
+
     return "\n".join(html)
 
 if __name__ == "__main__":
