@@ -9,11 +9,13 @@ HTTP. The calendar displays all 12 months of the current Jalali year in a respon
 layout with modern styling, highlighting today's date prominently. The Jalali calendar is the
 official calendar system used in Iran and Afghanistan.
 """
+
 import http.server
 import socketserver
 import time
 from multiprocessing import Process
 import jdatetime
+
 
 def jalali():
     """
@@ -36,6 +38,7 @@ def jalali():
             text_file.write(calendar_string)
         time.sleep(60)
 
+
 def server():
     """
     Launches an HTTP server to serve the generated Jalali calendar HTML file.
@@ -54,6 +57,7 @@ def server():
     with socketserver.TCPServer(("", port), Handler) as httpd:
         print("serving at port", port)
         httpd.serve_forever()
+
 
 def generate_jalali_html_calendar() -> str:
     """
@@ -82,10 +86,18 @@ def generate_jalali_html_calendar() -> str:
     current_day = today.day
 
     months_names = [
-        "Farvardin", "Ordibehesht", "Khordad",
-        "Tir", "Mordad", "Shahrivar",
-        "Mehr", "Aban", "Azar",
-        "Dey", "Bahman", "Esfand"
+        "Farvardin",
+        "Ordibehesht",
+        "Khordad",
+        "Tir",
+        "Mordad",
+        "Shahrivar",
+        "Mehr",
+        "Aban",
+        "Azar",
+        "Dey",
+        "Bahman",
+        "Esfand",
     ]
 
     # Traditional calendar headers (jdatetime index: Sat=0, Sun=1, ..., Fr=6)
@@ -184,16 +196,22 @@ def generate_jalali_html_calendar() -> str:
         "</head>",
         "<body>",
         f"    <h1>Jalali Year Calendar &mdash; {current_year}</h1>",
-        "    <div class='calendar-grid'>"
+        "    <div class='calendar-grid'>",
     ]
 
     # 3. Loop through all 12 months
     for m_idx in range(1, 13):
         html.append("        <table class='month-table'>")
-        html.append(f"            <tr><th colspan='7' class='month-title'>{months_names[m_idx-1]} ({m_idx})</th></tr>")
+        html.append(
+            f"            <tr><th colspan='7' class='month-title'>{months_names[m_idx-1]} ({m_idx})</th></tr>"
+        )
 
         # Add weekday row headers
-        html.append("            <tr>" + "".join(f"<th>{day}</th>" for day in week_headers) + "</tr>")
+        html.append(
+            "            <tr>"
+            + "".join(f"<th>{day}</th>" for day in week_headers)
+            + "</tr>"
+        )
 
         # Calculate days in the month
         if m_idx <= 6:
@@ -217,7 +235,11 @@ def generate_jalali_html_calendar() -> str:
 
         # Populate days
         for day in range(1, days_in_month + 1):
-            if current_year == today.year and m_idx == current_month and day == current_day:
+            if (
+                current_year == today.year
+                and m_idx == current_month
+                and day == current_day
+            ):
                 cell_class = " class='today'"
             else:
                 cell_class = ""
@@ -243,6 +265,7 @@ def generate_jalali_html_calendar() -> str:
     html.extend(["    </div>", "</body>", "</html>"])
 
     return "\n".join(html)
+
 
 if __name__ == "__main__":
     jalali_process = Process(target=jalali)
